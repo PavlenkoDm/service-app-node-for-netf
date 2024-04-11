@@ -1,0 +1,1936 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.1",
+    "title": "NEWS-WEBAPP-EXPRESS API",
+    "description": "NEWS-WEBAPP-EXPRESS API Documentation",
+    "license": {
+      "name": "URL to repository",
+      "url": "https://github.com/PavlenkoDm/news-webapp-express"
+    }
+  },
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "servers": [
+    {
+      "url": "https://news-webapp-express.onrender.com"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authorization and service endpoints for user"
+    },
+    {
+      "name": "News",
+      "description": "News endpoints"
+    }
+  ],
+  "paths": {
+    "/api/auth/sign-up": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User registration",
+        "parameters": [],
+        "requestBody": {
+          "description": "# Body description queries:\n\n**name** - string, user name.\n\n**email** - string, mail address. \n\n**password** - string, user password. \n",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "**New User Registered**\n\nResponse body description :\n\n**code** - status code\n\n**message** - status message\n\n**user** - object, User information.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error. All sign-up fields are required and must be filled in with correct values",
+            "content": {}
+          },
+          "409": {
+            "description": "Error. Email already in use",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/sign-in": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User login",
+        "parameters": [],
+        "requestBody": {
+          "description": "# Body description queries:\n\n**email** - string, mail address. \n\n**password** - string, user password. \n",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "**Successful operation**",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error. All sign-in fields are required and must be filled in with correct values",
+            "content": {}
+          },
+          "401": {
+            "description": "Error. User is not authentified / Password is not valid",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/sign-out": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User logout",
+        "parameters": [],
+        "description": "# Log out",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful sign-out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogOutResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error. User is not authorized",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/refresh": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Refresh tokens",
+        "parameters": [],
+        "description": "# Refresh user and tokens\n \nIn headers must be refresh token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshTokenResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error. Token not found",
+            "content": {}
+          },
+          "401": {
+            "description": "Error. Refresh token did not pass verification / Not authorized",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/current-user": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current user",
+        "parameters": [],
+        "description": "# Get current user info\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "# Get current user info success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error. User not found",
+            "content": {}
+          },
+          "401": {
+            "description": "Error. No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/update-email": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Update user email",
+        "parameters": [],
+        "description": "# Changing user's email\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "description": "# Body description queries:\n\n**updatedEmail** - string, user email.\n\n**currentPassword** - string, user password.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserEmailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error. Password incorrect / Email already in use",
+            "content": {}
+          },
+          "404": {
+            "description": "Error. User not found",
+            "content": {}
+          },
+          "401": {
+            "description": "Error. No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/update-password": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Update user password",
+        "parameters": [],
+        "description": "# Changing user's password\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "description": "# Body description queries:\n\n**newPassword** - string, user new password.\n\n**oldPassword** - string, user previous password.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserPasswordResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error. Password incorrect",
+            "content": {}
+          },
+          "404": {
+            "description": "Error. User not found",
+            "content": {}
+          },
+          "401": {
+            "description": "Error. No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/update-theme": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Update user theme",
+        "parameters": [],
+        "description": "# Changing user's theme\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "description": "# Body description queries:\n\n**updatedTheme** - string, user new theme(light / dark).",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserThemeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateUserThemeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error. User not found",
+            "content": {}
+          },
+          "401": {
+            "description": "Error. No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/forgot-password-request": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Restore user access to account",
+        "parameters": [],
+        "description": "# To restore user access to account\n \nIn body must be actual and valid email.",
+        "requestBody": {
+          "description": "# Body description queries:\n\n**email** - string, user's email.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error. User not found",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Sending failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/forgot-password-change": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Set new password",
+        "parameters": [],
+        "description": "# To set new password\n \nIn headers must be token. Which comes in a query string",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "description": "# Body description queries:\n \n**newPassword** - string, user's new password.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordChangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForgotPasswordChangeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error. All sign-in fields are required and must be filled in with correct values",
+            "content": {}
+          },
+          "401": {
+            "description": "Error. No Bearer / No token / Access token did not pass verification / Not authorized",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/google/auth": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign-in or sign-up with google account",
+        "parameters": [],
+        "description": "# To sign-in or sign-up with google account\n \nIf google account linked to existing user account it will be sign-in. Otherwise it will be sign-up with sign-in.",
+        "requestBody": {
+          "description": "# Body description queries:\n \n**email** - string, user's gmail.\n \n**sub** - string, user's sub from google response.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInOrSignUpWithGoogle"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/:socials/bind": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Bind socials account",
+        "parameters": [
+          {
+            "name": "socials",
+            "in": "path",
+            "description": "google or facebook or apple",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "/api/auth/google/bind"
+            }
+          }
+        ],
+        "description": "# To bind google/facebook/apple account to existing user account\n \nTo have an opportunity to sign-in with socials.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "description": "# Body description queries:\n \n**email** - string, user's email linked to socials.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BindSocialsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BindSocialsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error. URL param is not valid",
+            "content": {}
+          },
+          "409": {
+            "description": "Error. Email already in use",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/auth/:socials/unbind": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Unbind socials account",
+        "parameters": [
+          {
+            "name": "socials",
+            "in": "path",
+            "description": "google or facebook or apple",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "/api/auth/google/bind"
+            }
+          }
+        ],
+        "description": "# To unbind google/facebook/apple account from existing user account\n \nTo reject an opportunity to sign-in with socials.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnBindSocialsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error. URL param is not valid",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/news": {
+      "get": {
+        "tags": ["News"],
+        "summary": "Get all news",
+        "parameters": [],
+        "description": "# Get all the news of a registered user\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAllNewsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error. Unauthorized / No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/news/": {
+      "post": {
+        "tags": ["News"],
+        "summary": "Add news to database",
+        "parameters": [],
+        "description": "# Add news to database\n \nIn headers must be access access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "requestBody": {
+          "description": "# Body description queries:\n \n**Array of the news objects**",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostNewsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostNewsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error. Unauthorized / No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/news/favourite": {
+      "get": {
+        "tags": ["News"],
+        "summary": "Get favourite news",
+        "parameters": [],
+        "description": "# Get all favourite news from database\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetFavouriteNewsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error. Unauthorized / No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/news/read": {
+      "get": {
+        "tags": ["News"],
+        "summary": "Get news that has been read",
+        "parameters": [],
+        "description": "# Get all read news from database\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetReadNewsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error. Unauthorized / No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/news/history-log": {
+      "get": {
+        "tags": ["News"],
+        "summary": "Get history-log",
+        "parameters": [],
+        "description": "# Get history-log of deleted news from archive\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetHistoryLogResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error. Unauthorized / No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/news/archive": {
+      "get": {
+        "tags": ["News"],
+        "summary": "Get archive news",
+        "parameters": [],
+        "description": "# Get all archive news from database\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetArchiveNewsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error. Unauthorized / No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    },
+
+    "/api/news/archive/:id": {
+      "delete": {
+        "tags": ["News"],
+        "summary": "Delete archive news item by id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "ID of the news item"
+          }
+        ],
+        "description": "# Delete archive news from database\n \nIn headers must be access token.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteArchiveNewsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error. Unauthorized / No Bearer / No token / Access token did not pass verification / Not authorized(auth middleware)",
+            "content": {}
+          },
+          "500": {
+            "description": "Error. Database processing is failed",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "RegistrationRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "Joon Snow"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "example": "joonsnow@gmail.com",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "AbraCadabra123"
+          }
+        }
+      },
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "201"
+          },
+          "message": {
+            "type": "string",
+            "example": "User sign-up success"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "example": "Joon Snow"
+              },
+              "email": {
+                "type": "string",
+                "example": "joonsnow@gmail.com"
+              }
+            }
+          }
+        }
+      },
+
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "example": "joonsnow@gmail.com",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "AbraCadabra123"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "User sign-in success"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "Joon Snow"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "example": "joonsnow@gmail.com",
+                "format": "email"
+              }
+            }
+          },
+          "userTheme": {
+            "type": "string",
+            "description": "User's aplication theme",
+            "example": "dark"
+          },
+          "accessToken": {
+            "type": "string",
+            "description": "User's access token"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "User's refresh token"
+          },
+          "haveAccounts": {
+            "type": "object",
+            "properties": {
+              "google": {
+                "type": "boolean",
+                "example": "true"
+              },
+              "facebook": {
+                "type": "boolean",
+                "example": "false"
+              },
+              "apple": {
+                "type": "boolean",
+                "example": "false"
+              }
+            }
+          }
+        }
+      },
+
+      "LogOutResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Sign-out success"
+          }
+        }
+      },
+
+      "RefreshTokenResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Refresh user success"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string",
+                "description": "User's accessToken",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OTVkNjJlNjE4MzgwMzY4NTk0NDZjNCIsImlhdCI6MTY4NzYxMjMzMCwiZXhwIjoxNjg3Njk4NzMwfQ.Exk_soSUARn-t-7FDQKsiFBTutt_vc9ok9UPuTdGqBU"
+              },
+              "refreshToken": {
+                "type": "string",
+                "description": "User's refreshToken",
+                "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0OTVkNjJlNjE4MzgwMzY4NTk0NDZjNCIsImlhdCI6MTY4NzYxMjMzMCwiZXhwIjoxNjg3Njk4NzMwfQ.Exk_soSUARn-t-7FDQKsiFBTutt_vc9ok9UPuTdGqBU"
+              }
+            }
+          }
+        }
+      },
+
+      "CurrentUserResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Get current user success"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "User's id"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "Joon Snow"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "example": "joonsnow@gmail.com",
+                "format": "email"
+              }
+            }
+          },
+          "userTheme": {
+            "type": "string",
+            "description": "User's theme",
+            "example": "dark"
+          },
+          "haveAccounts": {
+            "type": "object",
+            "properties": {
+              "google": {
+                "type": "boolean",
+                "example": "true"
+              },
+              "facebook": {
+                "type": "boolean",
+                "example": "false"
+              },
+              "apple": {
+                "type": "boolean",
+                "example": "false"
+              }
+            }
+          }
+        }
+      },
+
+      "UpdateUserEmailRequest": {
+        "type": "object",
+        "properties": {
+          "updatedEmail": {
+            "type": "string",
+            "description": "User's email",
+            "example": "joonsnow@gmail.com",
+            "format": "email"
+          },
+          "currentPassword": {
+            "type": "string",
+            "description": "User's password",
+            "example": "AbraCadabra123"
+          }
+        }
+      },
+      "UpdateUserEmailResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Email is successfully updated"
+          },
+          "newEmail": {
+            "type": "string",
+            "description": "User's email",
+            "example": "joonsnow@gmail.com",
+            "format": "email"
+          }
+        }
+      },
+
+      "UpdateUserPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "description": "User's new password",
+            "example": "BlaBlaBla951"
+          },
+          "oldPassword": {
+            "type": "string",
+            "description": "User's previous password",
+            "example": "AbraCadabra123"
+          }
+        }
+      },
+      "UpdateUserPasswordResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "code",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Password is successfully updated"
+          }
+        }
+      },
+
+      "UpdateUserThemeRequest": {
+        "type": "object",
+        "properties": {
+          "updatedTheme": {
+            "type": "string",
+            "example": "light"
+          }
+        }
+      },
+      "UpdateUserThemeResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "code",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Theme is successfully updated"
+          },
+          "userTheme": {
+            "type": "string",
+            "example": "light"
+          }
+        }
+      },
+
+      "ForgotPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "example": "joonsnow@gmail.com"
+          }
+        }
+      },
+      "ForgotPasswordResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "code",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Email sent successfully"
+          }
+        }
+      },
+
+      "ForgotPasswordChangeRequest": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "description": "User's new password",
+            "example": "BlaBlaBla951"
+          }
+        }
+      },
+      "ForgotPasswordChangeResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Password has successfully changed"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "Joon Snow"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "example": "joonsnow@gmail.com",
+                "format": "email"
+              }
+            }
+          },
+          "userTheme": {
+            "type": "string",
+            "description": "User's aplication theme",
+            "example": "dark"
+          },
+          "accessToken": {
+            "type": "string",
+            "description": "User's access token"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "User's refresh token"
+          },
+          "haveAccounts": {
+            "type": "object",
+            "properties": {
+              "google": {
+                "type": "boolean",
+                "example": "true"
+              },
+              "facebook": {
+                "type": "boolean",
+                "example": "false"
+              },
+              "apple": {
+                "type": "boolean",
+                "example": "false"
+              }
+            }
+          }
+        }
+      },
+
+      "SignInOrSignUpWithGoogle": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's gmail",
+            "example": "joonsnow@gmail.com"
+          },
+          "sub": {
+            "type": "string",
+            "description": "User's sub",
+            "example": "76549873213213878654"
+          }
+        }
+      },
+
+      "BindSocialsRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's gmail",
+            "example": "joonsnow@gmail.com"
+          }
+        }
+      },
+      "BindSocialsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Account google linking successful"
+          },
+          "haveAccounts": {
+            "type": "object",
+            "properties": {
+              "google": {
+                "type": "boolean",
+                "example": "true"
+              },
+              "facebook": {
+                "type": "boolean",
+                "example": "false"
+              },
+              "apple": {
+                "type": "boolean",
+                "example": "false"
+              }
+            }
+          }
+        }
+      },
+
+      "UnBindSocialsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Account google unlinking successful"
+          },
+          "haveAccounts": {
+            "type": "object",
+            "properties": {
+              "google": {
+                "type": "boolean",
+                "example": "false"
+              },
+              "facebook": {
+                "type": "boolean",
+                "example": "false"
+              },
+              "apple": {
+                "type": "boolean",
+                "example": "false"
+              }
+            }
+          }
+        }
+      },
+
+      "GetAllNewsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Get all news success"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "isFavourite": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "hasRead": {
+                  "type": "boolean",
+                  "example": "false"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title of the news",
+                  "example": "The Best Teams That Money Could Buy"
+                },
+                "publishDate": {
+                  "type": "string",
+                  "example": "31/12/2023"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Short description of the news",
+                  "example": "The four teams in the College Football Playoff used cash payments from fan “collectives” in unique ways to build their rosters."
+                },
+                "edition": {
+                  "type": "string",
+                  "description": "Publishing house",
+                  "example": "New York Times"
+                },
+                "author": {
+                  "type": "string",
+                  "description": "Author of the news",
+                  "example": "David A. Fahrenthold and Billy Witz"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "What category does the news belong to?",
+                  "example": "U.S."
+                },
+                "imgLink": {
+                  "type": "string",
+                  "description": "Link to image",
+                  "example": "https://static01.nyt.com/images/2023/12/31/multimedia/31nat-ncaa-nil-jtwb/31nat-ncaa-nil-jtwb-mediumThreeByTwo440.jpg"
+                },
+                "imgAlt": {
+                  "type": "string",
+                  "description": "Image description",
+                  "example": "The Texas Longhorns at a game against the Iowa State Cyclones in November. Texas plan to pay linemen helped set precedents for collectives."
+                },
+                "newsUrl": {
+                  "type": "string",
+                  "description": "Link to the original news",
+                  "example": "https://www.nytimes.com/2023/12/31/us/college-athletes-nil-sugar-rose-bowl.html"
+                },
+                "materialType": {
+                  "type": "string",
+                  "description": "Type of the material",
+                  "example": "Article"
+                },
+                "additionDate": {
+                  "type": "number",
+                  "description": "The date the news item was added to favorites or read.",
+                  "example": "1704213699331"
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "PostNewsRequest": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "isFavourite": {
+              "type": "boolean",
+              "example": "true"
+            },
+            "hasRead": {
+              "type": "boolean",
+              "example": "false"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the news",
+              "example": "The Best Teams That Money Could Buy"
+            },
+            "publishDate": {
+              "type": "string",
+              "example": "31/12/2023"
+            },
+            "description": {
+              "type": "string",
+              "description": "Short description of the news",
+              "example": "The four teams in the College Football Playoff used cash payments from fan “collectives” in unique ways to build their rosters."
+            },
+            "edition": {
+              "type": "string",
+              "description": "Publishing house",
+              "example": "New York Times"
+            },
+            "author": {
+              "type": "string",
+              "description": "Author of the news",
+              "example": "David A. Fahrenthold and Billy Witz"
+            },
+            "category": {
+              "type": "string",
+              "description": "What category does the news belong to?",
+              "example": "U.S."
+            },
+            "imgLink": {
+              "type": "string",
+              "description": "Link to image",
+              "example": "https://static01.nyt.com/images/2023/12/31/multimedia/31nat-ncaa-nil-jtwb/31nat-ncaa-nil-jtwb-mediumThreeByTwo440.jpg"
+            },
+            "imgAlt": {
+              "type": "string",
+              "description": "Image description",
+              "example": "The Texas Longhorns at a game against the Iowa State Cyclones in November. Texas plan to pay linemen helped set precedents for collectives."
+            },
+            "newsUrl": {
+              "type": "string",
+              "description": "Link to the original news",
+              "example": "https://www.nytimes.com/2023/12/31/us/college-athletes-nil-sugar-rose-bowl.html"
+            },
+            "materialType": {
+              "type": "string",
+              "description": "Type of the material",
+              "example": "Article"
+            },
+            "additionDate": {
+              "type": "number",
+              "description": "The date the news item was added to favorites or read.",
+              "example": "1704213699331"
+            }
+          }
+        }
+      },
+      "PostNewsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "201"
+          },
+          "message": {
+            "type": "string",
+            "example": "Add news success"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "isFavourite": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "hasRead": {
+                  "type": "boolean",
+                  "example": "false"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title of the news",
+                  "example": "The Best Teams That Money Could Buy"
+                },
+                "publishDate": {
+                  "type": "string",
+                  "example": "31/12/2023"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Short description of the news",
+                  "example": "The four teams in the College Football Playoff used cash payments from fan “collectives” in unique ways to build their rosters."
+                },
+                "edition": {
+                  "type": "string",
+                  "description": "Publishing house",
+                  "example": "New York Times"
+                },
+                "author": {
+                  "type": "string",
+                  "description": "Author of the news",
+                  "example": "David A. Fahrenthold and Billy Witz"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "What category does the news belong to?",
+                  "example": "U.S."
+                },
+                "imgLink": {
+                  "type": "string",
+                  "description": "Link to image",
+                  "example": "https://static01.nyt.com/images/2023/12/31/multimedia/31nat-ncaa-nil-jtwb/31nat-ncaa-nil-jtwb-mediumThreeByTwo440.jpg"
+                },
+                "newsUrl": {
+                  "type": "string",
+                  "description": "Link to the original news",
+                  "example": "https://www.nytimes.com/2023/12/31/us/college-athletes-nil-sugar-rose-bowl.html"
+                },
+                "additionDate": {
+                  "type": "number",
+                  "description": "The date the news item was added to favorites or read.",
+                  "example": "1704213699331"
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "GetFavouriteNewsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Get favourite news success"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "isFavourite": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "hasRead": {
+                  "type": "boolean",
+                  "example": "false"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title of the news",
+                  "example": "The Best Teams That Money Could Buy"
+                },
+                "publishDate": {
+                  "type": "string",
+                  "example": "31/12/2023"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Short description of the news",
+                  "example": "The four teams in the College Football Playoff used cash payments from fan “collectives” in unique ways to build their rosters."
+                },
+                "edition": {
+                  "type": "string",
+                  "description": "Publishing house",
+                  "example": "New York Times"
+                },
+                "author": {
+                  "type": "string",
+                  "description": "Author of the news",
+                  "example": "David A. Fahrenthold and Billy Witz"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "What category does the news belong to?",
+                  "example": "U.S."
+                },
+                "imgLink": {
+                  "type": "string",
+                  "description": "Link to image",
+                  "example": "https://static01.nyt.com/images/2023/12/31/multimedia/31nat-ncaa-nil-jtwb/31nat-ncaa-nil-jtwb-mediumThreeByTwo440.jpg"
+                },
+                "imgAlt": {
+                  "type": "string",
+                  "description": "Image description",
+                  "example": "The Texas Longhorns at a game against the Iowa State Cyclones in November. Texas plan to pay linemen helped set precedents for collectives."
+                },
+                "newsUrl": {
+                  "type": "string",
+                  "description": "Link to the original news",
+                  "example": "https://www.nytimes.com/2023/12/31/us/college-athletes-nil-sugar-rose-bowl.html"
+                },
+                "materialType": {
+                  "type": "string",
+                  "description": "Type of the material",
+                  "example": "Article"
+                },
+                "additionDate": {
+                  "type": "number",
+                  "description": "The date the news item was added to favorites or read.",
+                  "example": "1704213699331"
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "GetReadNewsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Get has read news success"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "isFavourite": {
+                  "type": "boolean",
+                  "example": "false"
+                },
+                "hasRead": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title of the news",
+                  "example": "The Best Teams That Money Could Buy"
+                },
+                "publishDate": {
+                  "type": "string",
+                  "example": "31/12/2023"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Short description of the news",
+                  "example": "The four teams in the College Football Playoff used cash payments from fan “collectives” in unique ways to build their rosters."
+                },
+                "edition": {
+                  "type": "string",
+                  "description": "Publishing house",
+                  "example": "New York Times"
+                },
+                "author": {
+                  "type": "string",
+                  "description": "Author of the news",
+                  "example": "David A. Fahrenthold and Billy Witz"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "What category does the news belong to?",
+                  "example": "U.S."
+                },
+                "imgLink": {
+                  "type": "string",
+                  "description": "Link to image",
+                  "example": "https://static01.nyt.com/images/2023/12/31/multimedia/31nat-ncaa-nil-jtwb/31nat-ncaa-nil-jtwb-mediumThreeByTwo440.jpg"
+                },
+                "imgAlt": {
+                  "type": "string",
+                  "description": "Image description",
+                  "example": "The Texas Longhorns at a game against the Iowa State Cyclones in November. Texas plan to pay linemen helped set precedents for collectives."
+                },
+                "newsUrl": {
+                  "type": "string",
+                  "description": "Link to the original news",
+                  "example": "https://www.nytimes.com/2023/12/31/us/college-athletes-nil-sugar-rose-bowl.html"
+                },
+                "materialType": {
+                  "type": "string",
+                  "description": "Type of the material",
+                  "example": "Article"
+                },
+                "additionDate": {
+                  "type": "number",
+                  "description": "The date the news item was added to favorites or read.",
+                  "example": "1704213699331"
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "GetArchiveNewsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Get archive news success"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "65997c1b2ea2a71a985c1826"
+                },
+                "isFavourite": {
+                  "type": "boolean",
+                  "example": "false"
+                },
+                "hasRead": {
+                  "type": "boolean",
+                  "example": "true"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title of the news",
+                  "example": "The Best Teams That Money Could Buy"
+                },
+                "publishDate": {
+                  "type": "string",
+                  "example": "31/12/2023"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Short description of the news",
+                  "example": "The four teams in the College Football Playoff used cash payments from fan “collectives” in unique ways to build their rosters."
+                },
+                "edition": {
+                  "type": "string",
+                  "description": "Publishing house",
+                  "example": "New York Times"
+                },
+                "author": {
+                  "type": "string",
+                  "description": "Author of the news",
+                  "example": "David A. Fahrenthold and Billy Witz"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "What category does the news belong to?",
+                  "example": "U.S."
+                },
+                "imgLink": {
+                  "type": "string",
+                  "description": "Link to image",
+                  "example": "https://static01.nyt.com/images/2023/12/31/multimedia/31nat-ncaa-nil-jtwb/31nat-ncaa-nil-jtwb-mediumThreeByTwo440.jpg"
+                },
+                "imgAlt": {
+                  "type": "string",
+                  "description": "Image description",
+                  "example": "The Texas Longhorns at a game against the Iowa State Cyclones in November. Texas plan to pay linemen helped set precedents for collectives."
+                },
+                "newsUrl": {
+                  "type": "string",
+                  "description": "Link to the original news",
+                  "example": "https://www.nytimes.com/2023/12/31/us/college-athletes-nil-sugar-rose-bowl.html"
+                },
+                "materialType": {
+                  "type": "string",
+                  "description": "Type of the material",
+                  "example": "Article"
+                },
+                "additionDate": {
+                  "type": "number",
+                  "description": "The date the news item was added to favorites or read.",
+                  "example": "1704213699331"
+                }
+              }
+            }
+          }
+        }
+      },
+
+      "DeleteArchiveNewsResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Remove news success"
+          },
+          "_id": {
+            "type": "string",
+            "example": "65997c1b2ea2a71a985c1826"
+          }
+        }
+      },
+
+      "GetHistoryLogResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "http",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "example": "Get history-log success"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "example": "65997c1b2ea2a71a985c1826"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Title of the news",
+                  "example": "The Best Teams That Money Could Buy"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "What category does the news belong to?",
+                  "example": "U.S."
+                },
+                "newsUrl": {
+                  "type": "string",
+                  "description": "Link to the original news",
+                  "example": "https://www.nytimes.com/2023/12/31/us/college-athletes-nil-sugar-rose-bowl.html"
+                },
+                "additionDate": {
+                  "type": "number",
+                  "description": "The date the news item was added to favorites or read.",
+                  "example": "1704213699331"
+                },
+                "deletionDate": {
+                  "type": "number",
+                  "description": "The date the news item was deleted from archive.",
+                  "example": "1704213699553"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

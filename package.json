@@ -1,0 +1,49 @@
+{
+  "name": "service-app-node-for-netf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": ">14.20.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cross-env NODE_ENV=production node ./index.js",
+    "dev": "cross-env NODE_ENV=development nodemon ./index.js",
+    "lint": "eslint **/*.js",
+    "lint:fix": "eslint --fix **/*.js",
+    "build": "netlify-lambda build functions"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PavlenkoDm/service-app-node-for-netf.git"
+  },
+  "keywords": [],
+  "author": "Dmitry_Pavlenko <dmpavlenko07@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PavlenkoDm/service-app-node-for-netf/issues"
+  },
+  "homepage": "https://github.com/PavlenkoDm/service-app-node-for-netf",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
+    "swagger-ui-express": "^5.0.0",
+    "url-parse": "^1.5.10"
+  },
+  "devDependencies": {
+    "eslint": "^7.19.0",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "nodemon": "^2.0.15"
+  }
+}
